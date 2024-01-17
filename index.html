@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent a car Noari</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        nav {
+            width: 250px;
+            height: 100vh;
+            background-color: #f2f2f2;
+            position: fixed;
+            left: -250px;
+            transition: left 0.3s ease;
+        }
+
+        nav a {
+            display: block;
+            padding: 1em;
+            text-decoration: none;
+            color: black;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+        }
+
+        .open-nav {
+            left: 0;
+        }
+
+        .menu-icon {
+            font-size: 1.5em;
+            cursor: pointer;
+            margin: 20px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5em;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            display: table-cell;
+        }
+
+        button {
+            padding: 1em 2em;
+            margin: 0.5em;
+            cursor: pointer;
+        }
+
+        .plus-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1em 2em;
+            margin: 0.5em;
+            cursor: pointer;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 600px) {
+            th, td {
+                padding: 0.3em;
+            }
+
+            button, .plus-btn {
+                padding: 0.5em 1em;
+            }
+
+            .menu-icon {
+                display: block;
+            }
+
+            table {
+                margin-top: 0;
+            }
+        }
+
+        @media screen and (max-width: 400px) {
+            th, td {
+                padding: 0.2em;
+            }
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+<button onclick="shtoMakine()">Shto Makine</button>
+<button class="plus-btn" onclick="shtoRezervim()">+ Rezervim</button>
+
+<table id="tabelaMakina">
+    <tr>
+        <th>Makina</th>
+        <th>Tabelat</th>
+        <th>Status</th>
+        <th>Qmimi</th>
+        <th>Ditet</th>
+        <th>Pranim</th>
+        <th>Dorzim</th>
+        <th>Veprimet</th>
+        <th class="hamburger-icon">☰</th>
+
+    </tr>
+</table>
+
+<script>
+
+function toggleNav() {
+        const sideNav = document.getElementById('sideNav');
+        sideNav.classList.toggle('open-nav');
+    }
+
+    function showTable() {
+        toggleNav();
+        const thtdElements = document.querySelectorAll('th, td');
+        thtdElements.forEach(element => {
+            element.style.display = 'table-cell';
+        });
+    }
+
+
+    let makina = [];
+
+    function renderTable() {
+        const tabela = document.getElementById('tabelaMakina');
+        tabela.innerHTML = `
+            <tr>
+                <th>Makina</th>
+                <th>Tabelat</th>
+                <th>Status</th>
+                <th>Qmimi</th>
+                <th>Ditet</th>
+                <th>Pranim</th>
+                <th>Dorzim</th>
+                <th>Veprimet</th>
+            </tr>
+        `;
+
+        makina.forEach((makin, indeksi) => {
+            const rreshti = tabela.insertRow();
+            rreshti.innerHTML = `
+            <td>${makin.emri}</td>
+                <td>${makin.tabla}</td>
+                <td>${makin.status}</td>
+                <td>${makin.cmimi}</td>
+                <td>${makin.ditet}</td>
+                <td>${makin.dataMarrjes}</td>
+                <td>${makin.dataKthimit}</td>
+                <td>                <td>
+                    <button onclick="ndryshoStatus(${indeksi})">Ndrysho Statusin</button>
+                    <button onclick="ndryshoCmimin(${indeksi})">Ndrysho Cmimin</button>
+                    <button onclick="ndryshoDitet(${indeksi})">Ndrysho Ditet</button>
+                    <button onclick="fshijMakinen(${indeksi})">Fshij Makinen</button> <!-- New button for deleting car -->
+                </td>
+            `;
+        });
+    }
+
+    // Function to delete the selected car
+    function fshijMakinen(index) {
+        const confirmation = confirm('A jeni i sigurt që dëshironi ta fshini këtë makinë?');
+        if (confirmation) {
+            makina.splice(index, 1);
+            renderTable();
+            saveData();
+        }
+    }
+
+        makina.forEach((makin, indeksi) => {
+            const rreshti = tabela.insertRow();
+            rreshti.innerHTML = `
+                <td>${makin.emri}</td>
+                <td>${makin.tabla}</td>
+                <td>${makin.status}</td>
+                <td>${makin.cmimi}</td>
+                <td>${makin.ditet}</td>
+                <td>${makin.dataMarrjes}</td>
+                <td>${makin.dataKthimit}</td>
+                <td>
+                    <button onclick="ndryshoStatus(${indeksi})">Ndrysho Statusin</button>
+                    <button onclick="ndryshoCmimin(${indeksi})">Ndrysho Cmimin</button>
+                    <button onclick="ndryshoDitet(${indeksi})">Ndrysho Ditet</button>
+                </td>
+            `;
+        });
+    
+    function shtoMakine() {
+        const makineRe = {
+            emri: prompt('Vendos Emrin e Makines:'),
+            tabla: prompt('Vendos Regjistrimin e Tablave:'),
+            status: 'Boshe',
+            cmimi: 0,
+            ditet: 0,
+            dataMarrjes: '',
+            dataKthimit: '',
+        };
+
+        if (makineRe.emri && makineRe.tabla) {
+            makina.push(makineRe);
+            renderTable();
+            saveData();
+        }
+    }
+
+    function ndryshoStatus(index) {
+        const makinaIndeksi = makina[index];
+        makinaIndeksi.status = makinaIndeksi.status === 'Boshe' ? 'I Zene' : 'Boshe';
+        renderTable();
+        saveData();
+    }
+
+    function ndryshoCmimin(index) {
+        const makinaIndeksi = makina[index];
+        const cmimiIri = prompt('Vendos cmimin total te ri:');
+        if (cmimiIri !== null) {
+            makinaIndeksi.cmimi = parseFloat(cmimiIri);
+            renderTable();
+            saveData();
+        }
+    }
+
+    function ndryshoDitet(index) {
+        const makinaIndeksi = makina[index];
+        const ditetIra = prompt('Vendos ditet e marendura te reja:');
+        if (ditetIra !== null) {
+            makinaIndeksi.ditet = parseInt(ditetIra);
+            renderTable();
+            saveData();
+        }
+    }
+
+    function shtoRezervim() {
+        const selectedCarIndex = prompt('Makina qe keni zgjedhur e sata eshte e listuar ne list');
+        const selectedCar = makina[selectedCarIndex];
+
+        if (selectedCar) {
+            if (!selectedCar.reservations) {
+                selectedCar.reservations = [];
+            }
+
+            if (selectedCar.reservations.length >= 3) {
+                alert('Kjo makine ka arritur limitin e rezervimeve (3).');
+            } else {
+                const rezervim = {
+                    dataMarrjes: prompt('Vendos Daten e Marrjes:'),
+                    dataKthimit: prompt('Vendos Daten e Kthimit:'),
+                };
+
+                if (rezervim.dataMarrjes && rezervim.dataKthimit) {
+                    selectedCar.reservations.push(rezervim);
+                    renderTable();
+                    saveData();
+                }
+            }
+        } else {
+            alert('Makina nuk u gjet. Provoni përsëri.');
+        }
+    }
+
+
+    function saveData() {
+        localStorage.setItem('rentalData', JSON.stringify(makina));
+        console.log('Data saved successfully.');
+    }
+
+    window.onload = function () {
+        const storedData = localStorage.getItem('rentalData');
+        if (storedData) {
+            makina = JSON.parse(storedData);
+            renderTable();
+        }
+    };
+
+    // Ensure to call the function to render the table initially
+    renderTable();
+</script>
+
+</body>
+</html>
